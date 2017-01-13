@@ -107,7 +107,6 @@
 	    [10, 60]  // Northeast coordinates
 	];
 	var zoomThreshold=7;
-
         var slider = document.getElementById('slider');
         var sliderValue = document.getElementById('slider-value');
         var slider2 = document.getElementById('slider2');
@@ -123,16 +122,13 @@
 	    maxBounds: bounds,
 	});
      
-
-
 //////////////////////////////////////////////////////////////////////////////////////
 // Function that maps the data taking the radius as the input
+
 function  mapper(radius){
 
 str1="kmpop"
-
-radius=String(str1.concat(String(radius)));
-
+radius1=String(str1.concat(String(radius)));
  map.addLayer({
         'id': 'musmap',
         'source': 'musmap',
@@ -140,7 +136,7 @@ radius=String(str1.concat(String(radius)));
         'type': 'fill',
         'paint': {
         'fill-color': {
-         property: radius ,
+         property: radius1 ,
                 stops: [
               
                     [5, '#edf8b1'],
@@ -155,51 +151,49 @@ radius=String(str1.concat(String(radius)));
         },
             'fill-opacity': 0.7
     }});
-}
 
-
-      map.on('load', function() {
- map.addSource('musmap', {
-        type: 'geojson',
-        data: 'musmap.geojson'
-    });
-
-
-   mapper(20);
-
-
-   
-
-
-   map.on('click', function (e) {
+ //Adds in the popup when the map is clicked
+  map.on('click', function (e) {
     var features = map.queryRenderedFeatures(e.point, { layers: ['musmap'] });
     if (!features.length) {
         return;
     }
-
     var feature = features[0];
-
     var popup = new mapboxgl.Popup()
         .setLngLat(map.unproject(e.point))
-        .setHTML(feature.properties.rad +'</b> '+point_s+' within '+60+' km')
+        .setHTML(' '+feature.properties[radius1]+' museums within '+radius+' km')
         .addTo(map);
+
 });
 
-// Use the same approach as above to indicate that the symbols are clickable
+
+//End of function
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+//Loads the data
+  map.on('load', function() {
+  map.addSource('musmap', {
+        type: 'geojson',
+        data: 'musmap.geojson'
+    });
+
+//Calls the map for the first time with a radius of 20km
+   mapper(20);
+   
+ 
+
+// Indicate that the hexagons are clickable
 // by changing the cursor style to 'pointer'.
+
 map.on('mousemove', function (e) {
     var features = map.queryRenderedFeatures(e.point, { layers: ['musmap'] });
     map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
 });
-
 });
 
-
-
-
-
-
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//The slider that changes the layer as the radius changes
 slider.addEventListener('mouseup', function(e) {
         
         str1="kmpop";      
@@ -210,7 +204,8 @@ slider.addEventListener('mouseup', function(e) {
        mapper(as);
     	
 });
-	</script>
+
+</script>
 	
 
 	</body>
