@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+	<html>
+	<head>
+	    <meta charset='utf-8' />
+	    <title></title>
+	    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+	   <script src='https://api.mapbox.com/mapbox-gl-js/v0.31.0/mapbox-gl.js'></script>
+           <link href='https://api.mapbox.com/mapbox-gl-js/v0.31.0/mapbox-gl.css' rel='stylesheet' />
+	    <style>
+	        body { margin:0; padding:0; }
+	        #map { position:absolute; top:0; bottom:0; width:100%; }
+	    </style>
+	</head>
+	<body>
+	
+
+	<style>
+	  body { margin:0; padding:0; }
+	  #map { position:absolute; top:0; bottom:0; width:100%; }
+	.map-overlay {
+	    font:bold 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+	    position: absolute;
+	    width: 25%;
+	    bottom: 3%;
+	    left: 0;
+	    padding: 10px;
+	}
+	
+	.map-overlay .map-overlay-inner {
+	    background-color: #fff;
+	    box-shadow:0 1px 2px rgba(0, 0, 0, 0.20);
+	    border-radius: 3px;
+	    padding: 10px;
+	    margin-bottom: 10px;
+	}
+	
+	.map-overlay label {
+	    display: block;
+	    margin: 0 0 10px;
+	}
+	
+	.map-overlay input {
+	    background-color: transparent;
+	    display: inline-block;
+	    width: 100%;
+	    position: relative;
+	    margin: 0;
+	    cursor: ew-resize;
+	}
+	
+	.mapboxgl-popup {
+	    max-width: 150px;
+	    font: 16px/18px 'Open Sans Regular', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+	    font-weight: 600;
+	    opacity: 0.7;
+	}
+	
+	.legend {
+	    background-color: #fff;
+	    border-radius: 3px;
+	    box-shadow: 0 1px 2px rgba(0,0,0,0.10);
+	    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+	    padding: 10px;
+	    position: absolute;
+	    z-index: 1;
+	}
+	
+	.legend h4 {
+	    margin: 0 0 10px;
+	}
+	
+	.legend div span {
+	    border-radius: 50%;
+	    display: inline-block;
+	    height: 10px;
+	    margin-right: 5px;
+	    width: 10px;
+	}
+	
+	.right { right: 10px; }
+	.top { top: 10px; }
+	.left { left: 10px; }
+	.bottom { bottom: 10px; }
+	
+	</style>
+	
+
+	<div id='map'></div>
+	
+
+    <div class='map-overlay top'>
+    <div class='map-overlay-inner'>
+        <label>Radius: <span id='slider-value'></span></label>
+        <input id='slider' type='range' min='20' max='60' step='10' value='20' />
+    </div>
+    <div class='map-overlay-inner'>
+        <label>Intensity: <span id='slider-value2'></span></label>
+        <input id='slider2' type='range' min='0' max='1' step='0.1' value='1' />
+    </div>
+    </div>
+
+
+	<script>
+	
+	var bounds = [
+	    [-20, 49], // Southwest coordinates
+	    [10, 60]  // Northeast coordinates
+	];
+	var zoomThreshold=7;
+
+        var slider = document.getElementById('slider');
+        var sliderValue = document.getElementById('slider-value');
+        var slider2 = document.getElementById('slider2');
+        var sliderValue2 = document.getElementById('slider-value2');
+	
+	mapboxgl.accessToken = 'pk.eyJ1Ijoiam9obmFyZGF2aWVzIiwiYSI6ImNpeHRmZjhlYjAwMmUycW9qbHRvem0xa3gifQ.oQ9cnn8b5HATalxv9rppYg';
+	var map = new mapboxgl.Map({
+	    container: 'map',
+	    style: 'mapbox://styles/mapbox/light-v9',
+	    center: [-2.5, 53.5],
+	    minZoom: 5.4,
+	    zoom: 5.4,
+	    maxBounds: bounds,
+	});
+     
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+// Function that maps the data taking the radius as the input
+function  mapper(radius){
+
+str1="kmpop"
+
+radius=String(str1.concat(String(radius)));
+
+ map.addLayer({
+        'id': 'musmap',
+        'source': 'musmap',
+        'maxzoom': zoomThreshold,
+        'type': 'fill',
+        'paint': {
+        'fill-color': {
+         property: radius ,
+                stops: [
+              
+                    [5, '#edf8b1'],
+                    [10, '#c7e9b4'],
+                    [20, '#7fcdbb'],
+                    [50, '#41b6c4'],
+                    [100, '#1d91c0'],
+                    [150, '#225ea8'],
+                    [200, '#0c2c84'],
+                    [400, '#023858']
+                ]
+        },
+            'fill-opacity': 0.7
+    }});
+}
+
+
+      map.on('load', function() {
+ map.addSource('musmap', {
+        type: 'geojson',
+        data: 'musmap.geojson'
+    });
+
+
+   mapper(20);
+
+
+   
+
+
+   map.on('click', function (e) {
+    var features = map.queryRenderedFeatures(e.point, { layers: ['musmap'] });
+    if (!features.length) {
+        return;
+    }
+
+    var feature = features[0];
+
+    var popup = new mapboxgl.Popup()
+        .setLngLat(map.unproject(e.point))
+        .setHTML(feature.properties.rad +'</b> '+point_s+' within '+60+' km')
+        .addTo(map);
+});
+
+// Use the same approach as above to indicate that the symbols are clickable
+// by changing the cursor style to 'pointer'.
+map.on('mousemove', function (e) {
+    var features = map.queryRenderedFeatures(e.point, { layers: ['musmap'] });
+    map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+});
+
+});
+
+
+
+
+
+
+
+slider.addEventListener('mouseup', function(e) {
+        
+        str1="kmpop";      
+        sliderValue.textContent = e.target.value + 'km';
+       as=e.target.value;
+       map.removeLayer('musmap');
+        //Removes the hexgrid layer that is already on the map
+       mapper(as);
+    	
+});
+	</script>
+	
+
+	</body>
+	</html>
+
