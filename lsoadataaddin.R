@@ -1,4 +1,7 @@
-library('rgdal')
+library(geojsonio)
+library(sp)
+library(rgeos)
+library(rgdal)
 
 
 ###################################################################
@@ -118,8 +121,6 @@ lsoa<-spTransform(lsoa, CRS("+proj=longlat +datum=WGS84"))
 
 ################################################################################################################
 #Writes the file out as a geojson
-
-library(geojsonio)
 
 musg<-geojson_json(lsoa)
 
