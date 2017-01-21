@@ -22,7 +22,11 @@ lsoa@data<-cbind(lsoa@data, pop2015[match(lsoa@data[,c("lsoa11cd")],pop2015[ ,c(
 #Recodes the last column name
 names(lsoa@data)[ncol(lsoa@data)]<-"Population"
 
-multdep<-read.csv("filepath\\societal-wellbeing-imd-indices.csv", header=T, stringsAsFactors = FALSE)
+#Reads in the indices of multiple deprivation data
+multdep<-read.csv("filepath\\indexofmultiple deprivation2015.csv", header=T, stringsAsFactors = FALSE)
+
+#Extracts the part of the lsoacoding we want. It works, but inelegant better to do with a regex
+multdep$lsoacode<-paste("E0",lapply(strsplit(multdep$lsoa, " E0"), `[`, 2), sep="")
 
 lsoa@data$lsoa11cd<-as.character(lsoa@data$lsoa11cd)
 
