@@ -64,7 +64,7 @@ muscount<-function(x){
   
   wd=x*1000
   
-  #Generates a buffer for the UK width is how much inside the boundary the buffer extends 
+  #Generates a buffer around the centroid of the lsoa
   #The byid keeps the points separate rather than merging the buffer
   
   musbuf<-gBuffer(lpoints, width=wd,quadsegs=5,capStyle="ROUND", byid=TRUE)
