@@ -29,7 +29,7 @@ Hexrnd<-spsample(UK, 6000, type="hexagonal", nsig=TRUE)
 #Creates a hexagonal grid
 HexPols <- HexPoints2SpatialPolygons(Hexrnd)
 
-HexPols<-spTransform(HexPols,CRS("+proj=longlat +datum=WGS84"))
+//HexPols<-spTransform(HexPols,CRS("+proj=longlat +datum=WGS84"))
 HexPols<-spTransform(HexPols, CRS("+init=epsg:27700"))
 
 ############################################################################################################
@@ -44,7 +44,7 @@ pop2015<-read.csv("filepath\ONS data\\2015 lsoa population estimates.csv", heade
 
 #Attach the population
 lsoa@data<-cbind(lsoa@data, pop2015[match(lsoa@data[,c("lsoa11cd")],pop2015[ ,c("Area.Codes")]),c("All.Ages")])
-#Recodes the last column name2015 lsoa population estimates.csv
+#Recodes the last column name
 names(lsoa@data)[ncol(lsoa@data)]<-"Population"
 
 #Reads in the index of multiple deprivation data
