@@ -2,29 +2,32 @@ library(geojsonio)
 library(sp)
 library(rgeos)
 library(rgdal)
+library(maptools)
 ###############################################################################################################
-#Create a shape file of the UK that is overlayed with hexagons
 
-states<-readOGR("E:\\data","NUTS_RG_03M_2010")
+#Reads in the regional geojson
+reg = readOGR("filepath\public\\ENGmusreg.geojson" , "OGRGeoJSON")
 
-#Selects only the NUTS2 geographies
-states<-subset(states, states@data$STAT_LEVL_=='0')
+reg<-spTransform(reg,CRS("+proj=longlat +datum=WGS84"))
+#The code merges the English regional polygons to get an england shape file
+lps <- getSpPPolygonsLabptSlots(reg)
+IDOneBin <- cut(lps[,1], range(lps[,1]), include.lowest=TRUE)
+England  <- unionSpatialPolygons(reg,IDOneBin)
 
-#Selects the UK by matching NUTS codes that start with UK
-UK<-subset(states, grepl("^UK", states@data$NUTS_ID)==TRUE)
 
 #Adds a buffer to the UK to make the hexagons fit the approximate contour of the UK, not the fine detail of coastline
-UK<-spTransform(UK, CRS("+init=epsg:27700")) 
+England<-spTransform(England, CRS("+init=epsg:27700")) 
 
 #Generates a buffer for the UK width is how much inside the boundary the buffer extends 
-UK<-gBuffer(UK, width=3000,quadsegs=5,capStyle="ROUND", byid=TRUE)
- 
+England<-gBuffer(England, width=2900,quadsegs=5,capStyle="ROUND", byid=TRUE)
+
 #Transforms back the two areas to the standard projection we are using
-UK<-spTransform(UK, CRS("+proj=longlat +datum=WGS84"))
+England<-spTransform(England, CRS("+proj=longlat +datum=WGS84"))
 
 #Creates a Hexagonal grid that fills the UK
 #Randomly samples inside the shape of the UK, but in a hexagonal pattern was 4000
-Hexrnd<-spsample(UK, 6000, type="hexagonal", nsig=TRUE)
+Hexrnd<-spsample(England, 4000, type="hexagonal", nsig=TRUE)
+
 
 #Creates a hexagonal grid
 HexPols <- HexPoints2SpatialPolygons(Hexrnd)
