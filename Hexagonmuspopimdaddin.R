@@ -72,7 +72,7 @@ lpoints = SpatialPointsDataFrame(lpoints, lsoa@data)
 proj4string(lpoints) <- CRS("+proj=longlat +datum=WGS84")
 
 ###############################################################################################################
- #Estimates the population falling within the polygons #This bit is still not working
+ #Estimates the population falling within the polygons
 
 #finds the population that falls within the hexagons using the centroids of the lsoas
 popc<-over(HexPols,lpoints, returnList = TRUE)
